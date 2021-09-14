@@ -17,11 +17,18 @@ if(!empty($_POST)){
   $err_msg = array();
 
   //2.フォームが入力されていない場合
+  if(empty($_POST['username'])){
+
+    $err_msg['username'] = MSG01;
+
+  }
+
   if(empty($_POST['email'])){
 
     $err_msg['email'] = MSG01;
 
   }
+
   if(empty($_POST['pass'])){
 
     $err_msg['pass'] = MSG01;
@@ -35,10 +42,13 @@ if(!empty($_POST)){
 
   if(empty($err_msg)){
 
+
     //変数にユーザー情報を代入
+    $username = $_POST['username'];
     $email = $_POST['email'];
     $pass = $_POST['pass'];
     $pass_re = $_POST['pass_retype'];
+    $sex = $_POST['sex'];
 
     //3.emailの形式でない場合
     if(!preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $email)){
@@ -82,10 +92,10 @@ if(!empty($_POST)){
         $dbh = new PDO($dsn, $user, $password, $options);
 
         //SQL文（クエリー作成）
-        $stmt = $dbh->prepare('INSERT INTO users (email,pass,login_time) VALUES (:email,:pass,:login_time)');
+        $stmt = $dbh->prepare('INSERT INTO users (username,email,pass,login_time,sex) VALUES (:username,:email,:pass,:login_time,:sex)');
 
         //プレースホルダに値をセットし、SQL文を実行
-        $stmt->execute(array(':email' => $email, ':pass' => $pass, ':login_time' => date('Y-m-d H:i:s')));
+        $stmt->execute(array(':username' => $username, ':email' => $email, ':pass' =>  password_hash($_POST['pass'], PASSWORD_DEFAULT), ':login_time' => date('Y-m-d H:i:s'), ':sex' => $sex));
 
         header("Location:mypage.php"); //マイページへ
       }
@@ -160,8 +170,27 @@ if(!empty($_POST)){
 
         <h1>ユーザー登録</h1>
             <form method="post">
+        <span class="err_msg"><?php if(!empty($err_msg['username'])) echo $err_msg['username']; ?></span>
+                      <input type="text" name="username" placeholder="ユーザーネーム" value="<?php if(!empty($_POST['username'])) echo $_POST['username'];?>">
+
         <span class="err_msg"><?php if(!empty($err_msg['email'])) echo $err_msg['email']; ?></span>
                 <input type="text" name="email" placeholder="email" value="<?php if(!empty($_POST['email'])) echo $_POST['email'];?>">
+
+        <?php
+          if (isset($_POST['sex'])){
+            $sex = $_POST['sex'];
+            echo $sex;
+          }
+          else {
+            $sex = "0";
+          }
+         ?>
+        <select name="sex" size="1">
+        <option value="0" <?php if($sex === "0") echo "selected"?>>回答しない</option>
+        <option value="1" <?php if($sex === "1") echo "selected"?>>男</option>
+        <option value="2" <?php if($sex === "2") echo "selected"?>>女</option>
+        <option value="9" <?php if($sex === "9") echo "selected"?>>その他</option>
+        </select>
 
         <span class="err_msg"><?php if(!empty($err_msg['pass'])) echo $err_msg['pass']; ?></span>
                 <input type="password" name="pass" placeholder="パスワード" value="<?php if(!empty($_POST['pass'])) echo $_POST['pass'];?>">
