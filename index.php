@@ -97,7 +97,7 @@ if(!empty($_POST)){
         //プレースホルダに値をセットし、SQL文を実行
         $stmt->execute(array(':username' => $username, ':email' => $email, ':pass' =>  password_hash($_POST['pass'], PASSWORD_DEFAULT), ':login_time' => date('Y-m-d H:i:s'), ':sex' => $sex));
 
-        header("Location:mypage.php"); //マイページへ
+        header("Location:mypage2.php"); //マイページへ
       }
 
     }
@@ -200,6 +200,6 @@ if(!empty($_POST)){
 
                 <input type="submit" value="送信">
             </form>
-            <a href="mypage.php">マイページへ</a>
+            <a href="mypage2.php">マイページへ</a>
   </body>
 </html>
