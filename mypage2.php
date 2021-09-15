@@ -7,6 +7,36 @@ session_start();
 ?>
 
 
+<?php
+  //DBへの接続準備
+  $dsn = 'mysql:dbname=php?sample01;host=localhost;charset=utf8';
+  $user = 'root';
+  $password = 'root';
+  $options = array(
+          // SQL実行失敗時に例外をスロー
+          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+          // デフォルトフェッチモードを連想配列形式に設定
+          PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+          // バッファードクエリを使う(一度に結果セットをすべて取得し、サーバー負荷を軽減)
+          // SELECTで得た結果に対してもrowCountメソッドを使えるようにする
+          PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
+      );
+
+  // PDOオブジェクト生成（DBへ接続）
+  $dbh = new PDO($dsn, $user, $password, $options);
+
+  //SQL文（クエリー作成）
+  $stmt = $dbh->prepare('SELECT * FROM users WHERE email = :email AND pass = :pass');
+
+  //プレースホルダに値をセットし、SQL文を実行
+  $stmt->execute(array(':email' => $email, ':pass' =>  $pass));
+
+  $result = 0;
+
+  $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+?>
+
 
 <!DOCTYPE html>
 <html>
@@ -36,8 +66,8 @@ session_start();
     <h1>マイページ</h1>
       <section>
         <p>
-          あなたのemailは info@webukatu.com です。<br />
-          あなたのpassは password です。
+          あなたのemailは <?php if(!empty($reslut)) echo $_result['email'];?>です。<br />
+          あなたのpassは <?php if(!empty($reslut)) echo $reslut['pass'];?> です。
         </p>
         <a href="index.php">ユーザー登録画面へ</a>
       </section>
